@@ -3,18 +3,18 @@
 namespace Drupal\amazon_onsite\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileSystemInterface;;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * The settings form for amazon onsite module.
+ * The AOP feed form for amazon onsite module.
  */
-class SettingsForm extends ConfigFormBase {
+class AopFeedForm extends EntityForm {
 
   /**
    * Drupal\Core\Extension\ModuleHandlerInterface module handler.
@@ -34,7 +34,6 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, FileSystemInterface $file_system) {
-    parent::__construct($config_factory);
     $this->moduleHandler = $module_handler;
     $this->fileSystem = $file_system;
   }
@@ -53,43 +52,27 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
-    return [
-      'amazon_onsite.settings',
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getFormId() {
-    return 'amazon_onsite_settings_form';
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('amazon_onsite.settings');
+  public function form(array $form, FormStateInterface $form_state) {
+    $feedItem = $this->entity;
 
     $form['channel_title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Title'),
-      '#default_value' => $config->get('channel_title'),
+      '#default_value' => $feedItem->label(),
       '#required' => TRUE,
     ];
     $form['website_url'] = [
       '#type' => 'url',
       '#title' => $this->t('Website URL'),
       '#description' => $this->t('The website url which is associated with this RSS channel. (HTTPS is required)'),
-      '#default_value' => $config->get('website_url'),
+      '#default_value' => $feedItem->getUrl(),
       '#pattern' => 'https://.*',
       '#required' => TRUE,
     ];
     $form['feed_description'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Feed description'),
-      '#default_value' => $config->get('feed_description'),
+      '#default_value' => $feedItem->getDescription(),
       '#required' => TRUE,
     ];
     $form['logo'] = [
@@ -99,7 +82,7 @@ class SettingsForm extends ConfigFormBase {
     $form['logo']['logo_path'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Path to image'),
-      '#default_value' => $config->get('logo_path'),
+      '#default_value' => $feedItem->getLogoPath(),
     ];
     $form['logo']['logo_upload'] = [
       '#type' => 'file',
@@ -115,13 +98,13 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Language'),
       '#description' => $this->t('ISO639-1 language string'),
-      '#default_value' => $config->get('language'),
+      '#default_value' => $feedItem->getLanguage(),
       '#disabled' => TRUE,
     ];
     $form['channel_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Feed URL'),
-      '#default_value' => Url::fromRoute('amazon_onsite.rss', [], ['absolute' => TRUE])->toString(),
+      '#default_value' => $feedItem->toUrl(),
       '#disabled' => TRUE,
     ];
 
@@ -196,7 +179,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     try {
