@@ -1,3 +1,26 @@
+amazon_onsite.aop_feed.*:
+  type: config_entity
+  label: 'AOP Feed'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    channel_title:
+      type: string
+      label: 'Title'
+    website_url:
+      type: string
+      label: 'Website URL'
+    language:
+      type: string
+      label: 'Language'
+    logo_path:
+      type: 'string'
+      label: 'Channel logo'
+    feed_description:
+      type: 'string'
+      label: 'Feed description'
+
 amazon_onsite.settings:
   type: config_object
   label: 'Onsite settings'

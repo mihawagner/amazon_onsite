@@ -19,13 +19,6 @@ interface AopFeedInterface extends ConfigEntityInterface {
    */
   public function getUrl();
 
-  /**
-   * Sets the feed URL.
-   *
-   * @param string $url
-   *   The feed URL.
-   */
-  public function setUrl(string $url);
 
   /**
    * Returns the AOP feed description.
@@ -40,6 +33,8 @@ interface AopFeedInterface extends ConfigEntityInterface {
    *
    * @param string $description
    *   The description.
+   *
+   * @return $this
    */
   public function setDescription(string $description);
 

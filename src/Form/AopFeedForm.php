@@ -192,7 +192,7 @@ class AopFeedForm extends EntityForm {
       // Ignore.
     }
 
-    $this->config('amazon_onsite.settings')
+    $status = $this->entity
       ->set('channel_title', $form_state->getValue('channel_title'))
       ->set('website_url', $form_state->getValue('website_url'))
       ->set('feed_description', $form_state->getValue('feed_description'))
