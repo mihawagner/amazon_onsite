@@ -196,6 +196,7 @@ class AopFeedItem extends RevisionableContentEntityBase implements AopFeedItemIn
 
     $fields['feed'] = BaseFieldDefinition::create('string')
       ->setLabel(t('AOP Feed'))
+      ->setRevisionable(TRUE)
       ->setDescription(t('The AOP Feed this Feed item belongs to.'))
       ->setDisplayOptions('form', [
         'type' => 'options_select',
