@@ -5,6 +5,7 @@
  * Provides an aop feed item entity type.
  */
 
+use Drupal\amazon_onsite\Entity\AopFeed;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -48,4 +49,11 @@ function amazon_onsite_field_widget_form_alter(&$element, FormStateInterface $fo
       && \Drupal::service('entity_type.manager')->getStorage('filter_format')->load('amazon_onsite')) {
     $element['#format'] = 'amazon_onsite';
   }
+}
+
+/**
+ * Returns a list of allowed feeds for use in list_string field.
+ */
+function amazon_onsite_allowed_feeds() {
+  return AopFeed::all();
 }

@@ -194,7 +194,7 @@ class AopFeedItem extends RevisionableContentEntityBase implements AopFeedItemIn
       ])
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['feed'] = BaseFieldDefinition::create('string')
+    $fields['feed'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('AOP Feed'))
       ->setRevisionable(TRUE)
       ->setDescription(t('The AOP Feed this Feed item belongs to.'))
@@ -203,7 +203,10 @@ class AopFeedItem extends RevisionableContentEntityBase implements AopFeedItemIn
         'weight' => -4,
       ])
       ->setDisplayConfigurable('form', TRUE)
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setSettings([
+        'allowed_values_function' => 'amazon_onsite_allowed_feeds',
+      ]);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setRevisionable(TRUE)
