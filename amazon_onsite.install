@@ -13,6 +13,10 @@ use Drupal\amazon_onsite\Entity\AopFeed;
 function amazon_onsite_update_8902() {
   $config = \Drupal::config('amazon_onsite.settings');
 
+  if (empty($config->get('channel_title'))) {
+    return $this->t("No pre-existing valid configuration. No migrations need to be run.");
+  }
+
   AopFeed::create([
     'id' => 'default_feed',
     'channel_title' => $config->get('channel_title'),

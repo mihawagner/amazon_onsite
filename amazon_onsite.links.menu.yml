@@ -1,6 +1,6 @@
 amazon_onsite.settings:
-  title: Amazon Onsite Publishing configuration
-  description: Configure an AOP feed item entity type
+  title: Amazon Onsite Publishing feeds
+  description: Lists the available AOP feeds
   route_name:  entity.aop_feed.collection
   parent: system.admin_config_services
 entity.aop_feed_item.settings:

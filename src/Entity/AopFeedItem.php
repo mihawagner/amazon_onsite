@@ -147,6 +147,29 @@ class AopFeedItem extends RevisionableContentEntityBase implements AopFeedItemIn
   }
 
   /**
+   * Sets the feed the feed item belongs to.
+   *
+   * @param string $feed
+   *   The feed id.
+   *
+   * @return $this
+   */
+  public function setFeed($feed) {
+    $this->set('feed', $feed);
+    return $this;
+  }
+
+  /**
+   * Gets the feed id that this feed item belongs to.
+   *
+   * @return string
+   *   The feed id.
+   */
+  public function getFeed() {
+    return $this->get('feed')->value;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
@@ -170,6 +193,16 @@ class AopFeedItem extends RevisionableContentEntityBase implements AopFeedItemIn
         'weight' => -5,
       ])
       ->setDisplayConfigurable('view', TRUE);
+
+    $fields['feed'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('AOP Feed'))
+      ->setDescription(t('The AOP Feed this Feed item belongs to.'))
+      ->setDisplayOptions('form', [
+        'type' => 'options_select',
+        'weight' => -4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setRequired(TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setRevisionable(TRUE)

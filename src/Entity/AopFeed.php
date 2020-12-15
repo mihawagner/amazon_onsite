@@ -179,4 +179,19 @@ class AopFeed extends ConfigEntityBase implements AopFeedInterface {
     ];
   }
 
+  /**
+   * Returns a list suitable for usage in select options.
+   *
+   * @return array
+   *   Array keyed by AopFeed::id().
+   */
+  public static function all() {
+    $feeds = self::loadMultiple();
+    $result = [];
+    foreach ($feeds as $feed) {
+      $result[$feed->id()] = $feed->label();
+    }
+    return $result;
+  }
+
 }

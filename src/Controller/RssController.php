@@ -120,7 +120,7 @@ class RssController extends ControllerBase {
       '#langcode' => $entity->get('language'),
       '#last_build_date' => $this->getLastBuildDate(),
       '#logo_path' => $entity->get('logo_path') ? file_create_url($entity->get('logo_path')) : '',
-      '#items' => $this->buildItems(),
+      '#items' => $this->buildItems($id),
     ];
   }
 
@@ -146,17 +146,21 @@ class RssController extends ControllerBase {
   /**
    * Load entities.
    *
+   * @param string $feed
+   *   The feed id.
+   *
    * @return array|\Drupal\Core\Entity\EntityInterface[]
    *   An array of entity objects.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getItems() {
+  public function getItems($feed) {
     $storage = $this->entityTypeManager()->getStorage('aop_feed_item');
 
     $ids = $storage->getQuery()
       ->condition('status', 1)
+      ->condition('feed', $feed)
       ->sort('changed', 'DESC')
       ->execute();
 
@@ -170,17 +174,20 @@ class RssController extends ControllerBase {
   /**
    * Load entities and build a render array for item part of rss feed.
    *
+   * @param string $feed
+   *   The feed id.
+   *
    * @return array
    *   An array as expected by drupal_render().
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function buildItems() {
+  public function buildItems($feed) {
     $build = [];
 
     // Query the entities.
-    $items = $this->getItems();
+    $items = $this->getItems($feed);
     foreach ($items as $item) {
       $elements = [
         'title' => $item->getTitle(),
