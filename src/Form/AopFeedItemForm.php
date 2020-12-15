@@ -2,6 +2,7 @@
 
 namespace Drupal\amazon_onsite\Form;
 
+use Drupal\amazon_onsite\Entity\AopFeed;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -9,6 +10,13 @@ use Drupal\Core\Form\FormStateInterface;
  * Form controller for the aop feed item entity edit forms.
  */
 class AopFeedItemForm extends ContentEntityForm {
+
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
+    $form['feed']['widget']['#options'] += AopFeed::all();
+
+    return $form;
+  }
 
   /**
    * {@inheritdoc}

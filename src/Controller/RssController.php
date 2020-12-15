@@ -6,6 +6,7 @@ use Drupal\amazon_onsite\AopFeedItemInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Render\RenderContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -59,7 +60,11 @@ class RssController extends ControllerBase {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function buildResponse(string $aop_feed) {
-    $build = $this->build($aop_feed);
+    $context = new RenderContext();
+    $build = $this->renderer->executeInRenderContext($context, function() use ($aop_feed) {
+      return $this->build($aop_feed);
+    });
+
     // Set up an empty response, so for example RSS can set the proper
     // Content-Type header.
     $response = new CacheableResponse('', 200);
@@ -118,7 +123,7 @@ class RssController extends ControllerBase {
       '#link' => $entity->get('website_url'),
       '#description' => $entity->get('feed_description'),
       '#langcode' => $entity->get('language'),
-      '#last_build_date' => $this->getLastBuildDate(),
+      '#last_build_date' => $this->getLastBuildDate($id),
       '#logo_path' => $entity->get('logo_path') ? file_create_url($entity->get('logo_path')) : '',
       '#items' => $this->buildItems($id),
     ];
@@ -127,14 +132,17 @@ class RssController extends ControllerBase {
   /**
    * Return changed timestamp of most recently changed item.
    *
+   * @param $id
+   *   The feed id.
+   *
    * @return string|null
    *   A formatted timestamp.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getLastBuildDate() {
-    if ($items = $this->getItems()) {
+  public function getLastBuildDate($id) {
+    if ($items = $this->getItems($id)) {
       $latest_item = reset($items);
 
       return $this->dateFormatter->format($latest_item->getChangedTime(), 'custom', 'r');

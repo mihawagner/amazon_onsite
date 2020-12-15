@@ -114,7 +114,7 @@ class AopFeedForm extends EntityForm {
     $form['channel_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Feed URL'),
-      '#default_value' => $feedItem->getUrl(),
+      '#default_value' => $feedItem->isNew() ? '' : $feedItem->getUrl(),
       '#disabled' => TRUE,
     ];
 
