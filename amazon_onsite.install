@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Update hooks for amazon_onsite.
+ */
+
+use Drupal\amazon_onsite\Entity\AopFeed;
+
+/**
+ * Migrates AOP feed settings from config settings to config entity.
+ */
+function amazon_onsite_update_8901() {
+  $config = \Drupal::config('amazon_onsite.settings');
+
+  AopFeed::create([
+    'id' => 'default_feed',
+    'channel_title' => $config->get('channel_title'),
+    'website_url' => $config->get('website_url'),
+    'language' => $config->get('language'),
+    'logo_path' => $config->get('logo_path'),
+    'feed_description' => $config->get('feed_description'),
+  ])->save();
+
+  return t('Amazon onsite feed settings have been migrated to config entity.');
+}

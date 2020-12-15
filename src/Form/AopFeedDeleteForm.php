@@ -3,6 +3,7 @@
 namespace Drupal\amazon_onsite\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
@@ -28,6 +29,17 @@ class AopFeedDeleteForm extends EntityConfirmFormBase {
    */
   public function getCancelUrl() {
     return new Url('entity.aop_feed.collection');
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->entity->delete();
+    $this->messenger()->addMessage($this->t('The entity "@label" has been deleted.', [
+      '@label' => $this->entity->label(),
+    ]));
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }

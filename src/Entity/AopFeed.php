@@ -13,7 +13,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   id = "aop_feed",
  *   label = @Translation("AOP Feed"),
  *   config_prefix = "aop_feed",
- *   admin_permission = "",
+ *   admin_permission = "administer aop feeds",
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
@@ -28,8 +28,9 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   },
  *   links = {
  *     "canonical" = "/aop/{aop_feed}/rss.xml",
- *     "edit-form" = "/admin/config/system/aop_feed/{aop_feed}",
- *     "delete-form" = "/admin/config/system/aop_feed/{aop_feed}/delete",
+ *     "add-form" = "/admin/config/structure/aop_feed/add",
+ *     "edit-form" = "/admin/config/structure/aop_feed/{aop_feed}/edit",
+ *     "delete-form" = "/admin/config/structure/aop_feed/{aop_feed}/delete",
  *   },
  * )
  */
@@ -40,60 +41,78 @@ class AopFeed extends ConfigEntityBase implements AopFeedInterface {
    *
    * @var string
    */
-  protected $id;
+  public $id;
 
   /**
    * The AOP Feed title.
    *
    * @var string
    */
-  protected $title;
+  public $title;
 
   /**
    * The AOP Feed channel title.
    *
    * @var string
    */
-  protected $channel_title;
+  public $channel_title;
 
   /**
    * The AOP Feed website_url.
    *
    * @var string
    */
-  protected $website_url;
+  public $website_url;
 
   /**
    * The AOP Feed language.
    *
    * @var string
    */
-  protected $language;
+  public $language;
 
   /**
    * The AOP Feed logo path.
    *
    * @var string
    */
-  protected $logo_path;
+  public $logo_path;
 
   /**
    * The AOP Feed description.
    *
    * @var string
    */
-  protected $feed_description;
+  public $feed_description;
+
+  /**
+   * Returns the feed title.
+   *
+   * @return string
+   */
+  public function label() {
+    return $this->getTitle();
+  }
+
+  public function setTitle(string $title) {
+    $this->set('channel_title', $title);
+    return $this;
+  }
+
+  public function getTitle() {
+    return $this->get('channel_title');
+  }
 
   /**
    * {@inheritDoc}
    */
-  public function getUrl() {
-    try {
-      return $this->toUrl('canonical', ['absolute' => TRUE])->toString();
-    }
-    catch (\Throwable $exception) {
-      return NULL;
-    }
+  public function getWebsiteUrl() {
+    return $this->get('website_url');
+  }
+
+  public function setWebsiteUrl(string $url) {
+    $this->set('website_url', $url);
+    return $this;
   }
 
   /**
@@ -119,7 +138,7 @@ class AopFeed extends ConfigEntityBase implements AopFeedInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setLogoPath(string $logoPath) {
     $this->set('logo_path', $logoPath);
@@ -127,18 +146,37 @@ class AopFeed extends ConfigEntityBase implements AopFeedInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLanguage() {
     return $this->get('language');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setLanguage(string $language) {
     $this->set('language', $language);
     return $this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function getUrl() {
+    return $this->toUrl('canonical', ['absolute' => TRUE])->toString();
+  }
+
+  /**
+   * Allowed languages codes for AOP Feed.
+   *
+   * @return array
+   *   The language codes.
+   */
+  public static function supportedLanguages() {
+    return [
+      'de-DE' => 'de-DE',
+    ];
   }
 
 }

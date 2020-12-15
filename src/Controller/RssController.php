@@ -32,12 +32,20 @@ class RssController extends ControllerBase {
   protected $renderer;
 
   /**
+   * Entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     $instance = parent::create($container);
     $instance->dateFormatter = $container->get('date.formatter');
     $instance->renderer = $container->get('renderer');
+    $instance->entityTypeManager = $container->get('entity_type.manager');
     return $instance;
   }
 
@@ -50,8 +58,8 @@ class RssController extends ControllerBase {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function buildResponse() {
-    $build = $this->build();
+  public function buildResponse(string $aop_feed) {
+    $build = $this->build($aop_feed);
     // Set up an empty response, so for example RSS can set the proper
     // Content-Type header.
     $response = new CacheableResponse('', 200);
@@ -78,14 +86,18 @@ class RssController extends ControllerBase {
   /**
    * Build a render array for the RSS feed.
    *
+   * @param string $id
+   *   The id of the aop_feed.
+   *
    * @return array
    *   An array as expected by drupal_render().
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function build() {
-    $config = $this->config('amazon_onsite.settings');
+  public function build($id) {
+    $feedStorage = $this->entityTypeManager->getStorage('aop_feed');
+    $entity = $feedStorage->load($id);
 
     $required_configs = [
       'channel_title',
@@ -95,19 +107,19 @@ class RssController extends ControllerBase {
     ];
 
     foreach ($required_configs as $required_config) {
-      if (empty($config->get($required_config))) {
+      if (empty($entity->get($required_config))) {
         throw new \Exception("$required_config needs to be set.");
       }
     }
 
     return [
       '#theme' => 'rss_feed',
-      '#title' => $config->get('channel_title'),
-      '#link' => $config->get('website_url'),
-      '#description' => $config->get('feed_description'),
-      '#langcode' => $config->get('language'),
+      '#title' => $entity->get('channel_title'),
+      '#link' => $entity->get('website_url'),
+      '#description' => $entity->get('feed_description'),
+      '#langcode' => $entity->get('language'),
       '#last_build_date' => $this->getLastBuildDate(),
-      '#logo_path' => $config->get('logo_path') ? file_create_url($config->get('logo_path')) : '',
+      '#logo_path' => $entity->get('logo_path') ? file_create_url($entity->get('logo_path')) : '',
       '#items' => $this->buildItems(),
     ];
   }

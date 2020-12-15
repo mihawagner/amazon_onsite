@@ -12,15 +12,6 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface AopFeedInterface extends ConfigEntityInterface {
 
   /**
-   * Returns the URL of the AOP feed.
-   *
-   * @return string
-   *   The URL.
-   */
-  public function getUrl();
-
-
-  /**
    * Returns the AOP feed description.
    *
    * @return string

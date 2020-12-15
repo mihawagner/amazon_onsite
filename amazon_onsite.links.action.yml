@@ -1,3 +1,8 @@
+aop_feed.add_form_link:
+  route_name: entity.aop_feed.add_form
+  title: 'Add AOP feed'
+  appears_on:
+    - 'entity.aop_feed.collection'
 aop_feed_item.add_form:
   route_name: entity.aop_feed_item.add_form
   title: 'Add AOP feed item'

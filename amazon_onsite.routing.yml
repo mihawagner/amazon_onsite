@@ -8,6 +8,44 @@ amazon_onsite.settings:
   options:
     _admin_route: TRUE
 
+entity.aop_feed.collection:
+  path: '/admin/config/structure/aop-feeds'
+  defaults:
+    _entity_list: 'aop_feed'
+    _title: 'AOP Feeds'
+  requirements:
+    _permission: 'administer aop feeds'
+
+entity.aop_feed.add_form:
+  path: '/admin/config/structure/aop-feeds/add'
+  defaults:
+    _entity_form: aop_feed.add
+    _title: 'Add AOP Feed'
+  requirements:
+    _permission: 'add aop feed'
+  options:
+    _admin_route: TRUE
+
+entity.aop_feed.edit_form:
+  path: '/admin/config/structure/aop-feeds/{aop_feed}/edit'
+  defaults:
+    _entity_form: aop_feed.edit
+    _title: 'Edit AOP Feed'
+  requirements:
+    _permission: 'edit aop feed'
+  options:
+    _admin_route: TRUE
+
+entity.aop_feed.delete_form:
+  path: '/admin/config/structure/aop-feeds/{aop_feed}/delete'
+  defaults:
+    _entity_form: aop_feed.delete
+    _title: 'Delete AOP Feed'
+  requirements:
+    _permission: 'delete aop feed'
+  options:
+    _admin_route: TRUE
+
 entity.aop_feed_item.settings:
   path: 'admin/structure/aop-feed-item'
   defaults:
@@ -16,8 +54,8 @@ entity.aop_feed_item.settings:
   requirements:
     _permission: 'administer aop feed item'
 
-amazon_onsite.rss:
-  path: '/aop/rss'
+entity.aop_feed.canonical:
+  path: '/aop/{aop_feed}/rss.xml'
   defaults:
     _controller: '\Drupal\amazon_onsite\Controller\RssController::buildResponse'
   requirements:

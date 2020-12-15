@@ -1,10 +1,15 @@
 <?php
 
-namespace Drupal\amazon_onsite\Controller;
+namespace Drupal\amazon_onsite;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Class AopFeedListBuilder.
+ *
+ * @package Drupal\amazon_onsite
+ */
 class AopFeedListBuilder extends ConfigEntityListBuilder {
 
   /**
@@ -22,7 +27,7 @@ class AopFeedListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\amazon_onsite\Entity\AopFeedInterface $entity */
     $row['label'] = $entity->label();
-    $row['url'] = $entity->getUrl();
+    $row['url'] = $entity->toUrl('canonical', ['absolute' => TRUE]);
     return $row + parent::buildRow($entity);
   }
 

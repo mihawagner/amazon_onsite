@@ -2,6 +2,7 @@
 
 namespace Drupal\amazon_onsite\Form;
 
+use Drupal\amazon_onsite\Entity\AopFeed;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -55,6 +56,15 @@ class AopFeedForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $feedItem = $this->entity;
 
+    $form['id'] = [
+      '#type' => 'machine_name',
+      '#default_value' => $feedItem->id(),
+      '#machine_name' => [
+        'exists' => [$this, 'exist'],
+      ],
+      '#disabled' => !$feedItem->isNew(),
+    ];
+
     $form['channel_title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Title'),
@@ -65,7 +75,7 @@ class AopFeedForm extends EntityForm {
       '#type' => 'url',
       '#title' => $this->t('Website URL'),
       '#description' => $this->t('The website url which is associated with this RSS channel. (HTTPS is required)'),
-      '#default_value' => $feedItem->getUrl(),
+      '#default_value' => $feedItem->getWebsiteUrl(),
       '#pattern' => 'https://.*',
       '#required' => TRUE,
     ];
@@ -95,20 +105,20 @@ class AopFeedForm extends EntityForm {
     ];
 
     $form['language'] = [
-      '#type' => 'textfield',
+      '#type' => 'select',
+      '#options' => AopFeed::supportedLanguages(),
       '#title' => $this->t('Language'),
       '#description' => $this->t('ISO639-1 language string'),
       '#default_value' => $feedItem->getLanguage(),
-      '#disabled' => TRUE,
     ];
     $form['channel_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Feed URL'),
-      '#default_value' => $feedItem->toUrl(),
+      '#default_value' => $feedItem->getUrl(),
       '#disabled' => TRUE,
     ];
 
-    return parent::buildForm($form, $form_state);
+    return parent::form($form, $form_state);
   }
 
   /**
@@ -138,6 +148,12 @@ class AopFeedForm extends EntityForm {
         if (!$path) {
           $form_state->setErrorByName('logo_path', $this->t('The image path is invalid.'));
         }
+      }
+    }
+
+    if ($form_state->getValue('language')) {
+      if (!in_array($form_state->getValue('language'), AopFeed::supportedLanguages())) {
+        $form_state->setErrorByName('language', $this->t('Language is invalid.'));
       }
     }
   }
@@ -199,6 +215,37 @@ class AopFeedForm extends EntityForm {
       ->set('language', $form_state->getValue('language'))
       ->set('logo_path', !empty($logo_path) ? $logo_path : $form_state->getValue('logo_path'))
       ->save();
+
+    if ($status === SAVED_NEW) {
+      $this->messenger()->addMessage($this->t('Aop feed "@name" successfully added.', [
+        '@name' => $this->entity->label(),
+      ]));
+    }
+    else {
+      $this->messenger()->addMessage($this->t('Aop feed "@name" was changed..', [
+        '@name' => $this->entity->label(),
+      ]));
+    }
+    $form_state->setRedirect('entity.aop_feed.collection');
+  }
+
+  /**
+   * Checks if the entity exists.
+   *
+   * @param string $id
+   *   The entity machine name.
+   *
+   * @return bool
+   *   TRUE if entity exists, FALSE otherwise.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function exist($id) {
+    $entity = $this->entityTypeManager->getStorage('aop_feed')->getQuery()
+      ->condition('id', $id)
+      ->execute();
+    return (bool) $entity;
   }
 
 }
