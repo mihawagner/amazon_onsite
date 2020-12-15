@@ -10,7 +10,7 @@ use Drupal\amazon_onsite\Entity\AopFeed;
 /**
  * Migrates AOP feed settings from config settings to config entity.
  */
-function amazon_onsite_update_8901() {
+function amazon_onsite_update_8902() {
   $config = \Drupal::config('amazon_onsite.settings');
 
   AopFeed::create([
